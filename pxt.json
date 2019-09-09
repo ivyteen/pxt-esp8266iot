@@ -8,7 +8,7 @@
     },
     "files": [
         "README.md",
-        "ESP8266.ts",
+        "magiceco_iot.ts",
         "_locales/ko/ESP8266_IoT-strings.json"
     ],
     "testFiles": [
