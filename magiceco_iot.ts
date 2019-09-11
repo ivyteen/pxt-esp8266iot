@@ -118,7 +118,7 @@ namespace ESP8266_IoT {
                     + "&field6=" + n6
                     + "&field7=" + n7
                     + "&field8=" + n8
-ß
+
         if (thingspeak_connected) {
             toSendStr = "POST /insert.php"
             toSendStr = toSendStr + " HTTP/1.1" + "\u000D\u000A"
