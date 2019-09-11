@@ -108,9 +108,10 @@ namespace ESP8266_IoT {
     //% write_api_key.defl=your_write_api_key
     //% subcategory="ThingSpeak"
     export function setdata(write_api_key: string, n1: number, n2: number, n3: number, n4: number, n5: number, n6: number, n7: number, n8: number) {
-        /*
+
         let data = "api_key=" + write_api_key
                     + "&field1=" + n1
+/*
                     + "&field2=" + n2
                     + "&field3=" + n3
                     + "&field4=" + n4
@@ -118,23 +119,23 @@ namespace ESP8266_IoT {
                     + "&field6=" + n6
                     + "&field7=" + n7
                     + "&field8=" + n8
-
+*/
         if (thingspeak_connected) {
-            toSendStr = "GET /insert.php?"
-            toSendStr = toSendStr + data
+            toSendStr = "POST /insert.php"
             toSendStr = toSendStr + " HTTP/1.1" + "\u000D\u000A"
             toSendStr = toSendStr + "Host: data.plaive.10make.com" + "\u000D\u000A"
             toSendStr = toSendStr + "Content-Type: application/x-www-form-urlencoded" + "\u000D\u000A"
-            toSendStr = toSendStr + "Content-Length: " + data.length + "\u000D\u000A"
-            toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
+            toSendStr = toSendStr + "Content-Length: " + data.length + "\u000D\u000A\u000D\u000A"
+            toSendStr = toSendStr + data
+            //toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
         }
-        */
-
+       
+/*
        if (thingspeak_connected) {
             toSendStr = "GET /insert.php?api_key="
                 + write_api_key
                 + "&field1="
-                + n1       
+                + n1
                 + "&field2="
                 + n2
                 + "&field3="
@@ -150,7 +151,7 @@ namespace ESP8266_IoT {
                 + "&field8="
                 + n8
         }
-        
+*/        
     }
     /**
     * upload data. It would not upload anything if it failed to connect to Wifi or ThingSpeak.
