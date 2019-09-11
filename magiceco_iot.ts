@@ -111,7 +111,6 @@ namespace ESP8266_IoT {
 
         let data = "api_key=" + write_api_key
                     + "&field1=" + n1
-/*
                     + "&field2=" + n2
                     + "&field3=" + n3
                     + "&field4=" + n4
@@ -119,7 +118,7 @@ namespace ESP8266_IoT {
                     + "&field6=" + n6
                     + "&field7=" + n7
                     + "&field8=" + n8
-*/
+ß
         if (thingspeak_connected) {
             toSendStr = "POST /insert.php"
             toSendStr = toSendStr + " HTTP/1.1" + "\u000D\u000A"
