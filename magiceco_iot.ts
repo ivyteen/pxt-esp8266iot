@@ -35,6 +35,7 @@ namespace ESP8266_IoT {
         let serial_str: string = ""
         let result: boolean = false
         let time: number = input.runningTime()
+	    
         while (true) {
             serial_str += serial.readString()
             if (serial_str.length > 200)
@@ -46,7 +47,7 @@ namespace ESP8266_IoT {
             if (serial_str.includes("ERROR") || serial_str.includes("FAIL")) {
                 break
             }
-            if (input.runningTime() - time > 5000) {
+            if ((input.runningTime() - time) > 5000) {
                 break
             }
         }
@@ -61,14 +62,20 @@ namespace ESP8266_IoT {
     //% ssid.defl=your_ssid
     //% pw.defl=your_password
     export function initWIFI(tx: SerialPin, rx: SerialPin, baudrate: BaudRate) {
+
         serial.redirect(
             tx,
             rx,
             baudrate
         )
         sendAT("AT+RESTORE", 1000) // restore to factory settings
-        sendAT("AT+CWMODE=1") // set to STA mode
-        sendAT("AT+RST", 1000) // reset
+      
+        //sendAT("AT+RST", 1000) // reset
+        sendAT("AT+CWMODE=1",1000)
+        sendAT("AT+CIPMUX=0",1000)
+        sendAT("ATE0",1000)
+        //sendAT("AT+GMR") // view version info
+        
         basic.pause(100)
     }
     /**
@@ -82,8 +89,17 @@ namespace ESP8266_IoT {
         wifi_connected = false
         thingspeak_connected = false
         kitsiot_connected = false
+        //OLED.writeString("Connect Wifi : ")
         sendAT("AT+CWJAP=\"" + ssid + "\",\"" + pw + "\"", 0) // connect to Wifi router
         wifi_connected = waitResponse()
+        
+        /*
+        if(wifi_connected == true)
+            OLED.writeStringNewLine("OK")
+        else
+            OLED.writeStringNewLine("FAIL")
+        */
+
         basic.pause(100)
     }
     /**
@@ -96,8 +112,10 @@ namespace ESP8266_IoT {
         if (wifi_connected && kitsiot_connected == false) {
             thingspeak_connected = false
             let text = "AT+CIPSTART=\"TCP\",\"data.plaive.10make.com\",80"
+            //let text = "AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80"
+            
             sendAT(text, 0) // connect to website server
-            thingspeak_connected = waitResponse()
+            thingspeak_connected = waitResponse()  
             basic.pause(100)
         }
     }
@@ -118,8 +136,7 @@ namespace ESP8266_IoT {
                     + "&field6=" + n6
                     + "&field7=" + n7
                     + "&field8=" + n8
-
-        if (thingspeak_connected) {
+	    if (thingspeak_connected) {
             toSendStr = "POST /insert.php"
             toSendStr = toSendStr + " HTTP/1.1" + "\u000D\u000A"
             toSendStr = toSendStr + "Host: data.plaive.10make.com" + "\u000D\u000A"
@@ -128,13 +145,15 @@ namespace ESP8266_IoT {
             toSendStr = toSendStr + data
             //toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
         }
-       
-/*
+  
+ 
+  /*
        if (thingspeak_connected) {
             toSendStr = "GET /insert.php?api_key="
                 + write_api_key
                 + "&field1="
                 + n1
+                
                 + "&field2="
                 + n2
                 + "&field3="
@@ -149,8 +168,17 @@ namespace ESP8266_IoT {
                 + n7
                 + "&field8="
                 + n8
+
+            toSendStr = toSendStr + " HTTP/1.1" + "\u000D\u000A"
+            toSendStr = toSendStr + "Host: data.plaive.10make.com" + "\u000D\u000A"
+            toSendStr = toSendStr + "Cache-Control: no-cache" + "\u000D\u000A"
+            toSendStr = toSendStr + "Content-Type: application/x-www-form-urlencoded" + "\u000D\u000A"
+            //toSendStr = toSendStr + "Content-Length: " + data.length + "\u000D\u000A\u000D\u000A"
+            //toSendStr = toSendStr + data
+            toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
+
         }
-*/        
+       */ 
     }
     /**
     * upload data. It would not upload anything if it failed to connect to Wifi or ThingSpeak.
@@ -163,6 +191,7 @@ namespace ESP8266_IoT {
             sendAT("AT+CIPSEND=" + (toSendStr.length + 2), 100)
             sendAT(toSendStr, 100) // upload data
             last_upload_successful = waitResponse()
+            sendAT("AT+CIPCLOSE",0)
             basic.pause(100)
         }
     }
