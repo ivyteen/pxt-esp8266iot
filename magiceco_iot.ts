@@ -6,11 +6,12 @@ namespace ESP8266_IoT {
 
     let wifi_connected: boolean = false
     let thingspeak_connected: boolean = false
-    let kitsiot_connected: boolean = false
-    let last_upload_successful: boolean = false
+    let plaive_connected: boolean = false
+    let plaive_last_upload_successful: boolean = false
+    let ts_last_upload_successful: boolean = false
+
     let userToken_def: string = ""
     let topic_def: string = ""
-    let recevice_kidiot_text = ""
     const EVENT_ON_ID = 100
     const EVENT_ON_Value = 200
     const EVENT_OFF_ID = 110
@@ -56,6 +57,7 @@ namespace ESP8266_IoT {
     /**
     * Initialize ESP8266 module 
     */
+	//% inlineInputMode=external
     //% block="set ESP8266|RX %tx|TX %rx|Baud rate %baudrate"
     //% tx.defl=SerialPin.P8
     //% rx.defl=SerialPin.P12
@@ -81,14 +83,15 @@ namespace ESP8266_IoT {
     /**
     * connect to Wifi router
     */
-    //% block="connect Wifi SSID = %ssid|KEY = %pw"
+	//% inlineInputMode=external
+    //% block="connect Wifi|SSID = %ssid|KEY = %pw"
     //% ssid.defl=your_ssid
     //% pw.defl=your_pw
     export function connectWifi(ssid: string, pw: string) {
 
         wifi_connected = false
         thingspeak_connected = false
-        kitsiot_connected = false
+        plaive_connected = false
         //OLED.writeString("Connect Wifi : ")
         sendAT("AT+CWJAP=\"" + ssid + "\",\"" + pw + "\"", 0) // connect to Wifi router
         wifi_connected = waitResponse()
@@ -103,57 +106,84 @@ namespace ESP8266_IoT {
         basic.pause(100)
     }
     /**
+    * Connect to Plaive
+    */
+    //% block="connect Plaive"
+    //% write_api_key.defl=your_write_api_key
+    //% subcategory="Plaive"
+    export function connectPlaive() {
+        if (wifi_connected && thingspeak_connected == false) {
+            plaive_connected = false
+            let text = "AT+CIPSTART=\"TCP\",\"data.plaive.10make.com\",80"
+            //let text = "AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80"
+            
+            sendAT(text, 0) // connect to website server
+            plaive_connected = waitResponse()  
+            basic.pause(100)
+        }
+    }
+
+ /**
     * Connect to ThingSpeak
     */
     //% block="connect thingspeak"
     //% write_api_key.defl=your_write_api_key
     //% subcategory="ThingSpeak"
     export function connectThingSpeak() {
-        if (wifi_connected && kitsiot_connected == false) {
+        if (wifi_connected && plaive_connected == false) {
             thingspeak_connected = false
-            let text = "AT+CIPSTART=\"TCP\",\"data.plaive.10make.com\",80"
-            //let text = "AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80"
+            //let text = "AT+CIPSTART=\"TCP\",\"data.plaive.10make.com\",80"
+            let text = "AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80"
             
             sendAT(text, 0) // connect to website server
             thingspeak_connected = waitResponse()  
             basic.pause(100)
         }
     }
+
     /**
+    * Connect to Plaive and set data. 
+    */
+	//% inlineInputMode=external
+    //% block="set data to send Plaive|Write API key = %write_api_key|Field 1 = %n1|Field 2 = %n2" 
+    //% write_api_key.defl=your_write_api_key
+    //% subcategory="Plaive"
+    export function setDataPlaive(write_api_key: string, n1: number, n2: number) {
+
+        let data = "api_key=" + write_api_key
+                    + "&field1=" + n1
+                    + "&field2=" + n2
+                /*    + "&field3=" + n3
+                    + "&field4=" + n4
+                    + "&field5=" + n5
+                    + "&field6=" + n6
+                    + "&field7=" + n7
+                    + "&field8=" + n8 */
+	    if (plaive_connected) {
+            toSendStr = "POST /insert.php"
+            toSendStr = toSendStr + " HTTP/1.1" + "\r\n"
+            toSendStr = toSendStr + "Host: data.plaive.10make.com" + "\r\n"
+            toSendStr = toSendStr + "Content-Type: application/x-www-form-urlencoded" + "\r\n"
+            toSendStr = toSendStr + "Content-Length: " + data.length + "\r\n\r\n"
+            toSendStr = toSendStr + data
+            //toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
+        }
+
+    }
+
+
+/**
     * Connect to ThingSpeak and set data. 
     */
     //% block="set data to send ThingSpeak|Write API key = %write_api_key|Field 1 = %n1|Field 2 = %n2|Field 3 = %n3|Field 4 = %n4|Field 5 = %n5|Field 6 = %n6|Field 7 = %n7|Field 8 = %n8"
     //% write_api_key.defl=your_write_api_key
     //% subcategory="ThingSpeak"
-    export function setdata(write_api_key: string, n1: number, n2: number, n3: number, n4: number, n5: number, n6: number, n7: number, n8: number) {
-
-        let data = "api_key=" + write_api_key
-                    + "&field1=" + n1
-                    + "&field2=" + n2
-                    + "&field3=" + n3
-                    + "&field4=" + n4
-                    + "&field5=" + n5
-                    + "&field6=" + n6
-                    + "&field7=" + n7
-                    + "&field8=" + n8
-	    if (thingspeak_connected) {
-            toSendStr = "POST /insert.php"
-            toSendStr = toSendStr + " HTTP/1.1" + "\u000D\u000A"
-            toSendStr = toSendStr + "Host: data.plaive.10make.com" + "\u000D\u000A"
-            toSendStr = toSendStr + "Content-Type: application/x-www-form-urlencoded" + "\u000D\u000A"
-            toSendStr = toSendStr + "Content-Length: " + data.length + "\u000D\u000A\u000D\u000A"
-            toSendStr = toSendStr + data
-            //toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
-        }
-  
- 
-  /*
-       if (thingspeak_connected) {
-            toSendStr = "GET /insert.php?api_key="
+    export function setDataThingSpeak(write_api_key: string, n1: number, n2: number, n3: number, n4: number, n5: number, n6: number, n7: number, n8: number) {
+        if (thingspeak_connected) {
+            toSendStr = "GET /update?api_key="
                 + write_api_key
                 + "&field1="
                 + n1
-                
                 + "&field2="
                 + n2
                 + "&field3="
@@ -168,29 +198,37 @@ namespace ESP8266_IoT {
                 + n7
                 + "&field8="
                 + n8
-
-            toSendStr = toSendStr + " HTTP/1.1" + "\u000D\u000A"
-            toSendStr = toSendStr + "Host: data.plaive.10make.com" + "\u000D\u000A"
-            toSendStr = toSendStr + "Cache-Control: no-cache" + "\u000D\u000A"
-            toSendStr = toSendStr + "Content-Type: application/x-www-form-urlencoded" + "\u000D\u000A"
-            //toSendStr = toSendStr + "Content-Length: " + data.length + "\u000D\u000A\u000D\u000A"
-            //toSendStr = toSendStr + data
-            toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
-
         }
-       */ 
     }
+
+
     /**
+    * upload data. It would not upload anything if it failed to connect to Wifi or ThingSpeak.
+    */
+    //% block="Upload data to Plaive"
+    //% subcategory="Plaive"
+    export function uploadDataPlaive() {
+        if (plaive_connected) {
+            plaive_last_upload_successful = false
+            sendAT("AT+CIPSEND=" + (toSendStr.length + 2), 100)
+            sendAT(toSendStr, 100) // upload data
+            plaive_last_upload_successful = waitResponse()
+            sendAT("AT+CIPCLOSE",0)
+            basic.pause(100)
+        }
+    }
+
+   /**
     * upload data. It would not upload anything if it failed to connect to Wifi or ThingSpeak.
     */
     //% block="Upload data to ThingSpeak"
     //% subcategory="ThingSpeak"
-    export function uploadData() {
+    export function uploadDataThingSpeak() {
         if (thingspeak_connected) {
-            last_upload_successful = false
+            ts_last_upload_successful = false
             sendAT("AT+CIPSEND=" + (toSendStr.length + 2), 100)
             sendAT(toSendStr, 100) // upload data
-            last_upload_successful = waitResponse()
+            ts_last_upload_successful = waitResponse()
             sendAT("AT+CIPCLOSE",0)
             basic.pause(100)
         }
@@ -219,6 +257,20 @@ namespace ESP8266_IoT {
     }
 
     /**
+    * Check if ESP8266 successfully connected to Plaive
+    */
+    //% block="Plaive connected %State"
+    //% subcategory="Plaive"
+    export function plaiveState(state: boolean) {
+        if (plaive_connected == state) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+
+ /**
     * Check if ESP8266 successfully connected to ThingSpeak
     */
     //% block="ThingSpeak connected %State"
@@ -232,114 +284,32 @@ namespace ESP8266_IoT {
         }
     }
 
-
     /**
+    * Check if ESP8266 successfully uploaded data to Plaive
+    */
+    //% block="Plaive Last data upload %State"
+    //% subcategory="Plaive"
+    export function plaiveLastUploadState(state: boolean) {
+        if (plaive_last_upload_successful == state) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+
+/**
     * Check if ESP8266 successfully uploaded data to ThingSpeak
     */
     //% block="ThingSpeak Last data upload %State"
     //% subcategory="ThingSpeak"
     export function tsLastUploadState(state: boolean) {
-        if (last_upload_successful == state) {
+        if (ts_last_upload_successful == state) {
             return true
         }
         else {
             return false
         }
-    }
-    /*-----------------------------------kitsiot---------------------------------*/
-    /**
-    * Connect to kitsiot
-    */
-    //% subcategory=KidsIot
-    //% blockId=initkitiot block="connect KidsIot with userToken: %userToken Topic: %topic"
-    export function connectKidsiot(userToken: string, topic: string): void {
-        if (wifi_connected && thingspeak_connected == false) {
-            userToken_def = userToken
-            topic_def = topic
-            sendAT("AT+CIPSTART=\"TCP\",\"139.159.161.57\",5555", 0) // connect to website server
-            let text_one = "{\"topic\":\"" + topic + "\",\"userToken\":\"" + userToken + "\",\"op\":\"init\"}"
-            sendAT("AT+CIPSEND=" + (text_one.length + 2),0)
-            sendAT(text_one, 0)
-            kitsiot_connected = waitResponse()
-        }
-    }
-    /**
-    * upload data to kitsiot
-    */
-    //% subcategory=KidsIot
-    //% blockId=uploadkitsiot block="upload data %data to kidsiot"
-    export function uploadKidsiot(data: number): void {
-        if (kitsiot_connected) {
-            data = Math.floor(data)
-            let text_one = "{\"topic\":\"" + topic_def + "\",\"userToken\":\"" + userToken_def + "\",\"op\":\"up\",\"data\":\"" + data + "\"}"
-            sendAT("AT+CIPSEND=" + (text_one.length + 2),0)
-            sendAT(text_one, 0)
-        }
-    }
-    /**
-    * disconnect from kitsiot
-    */
-    //% subcategory=KidsIot
-    //% blockId=Disconnect block="Disconnect from kidsiot"
-    export function disconnectKidsiot(): void {
-        if (kitsiot_connected) {
-            let text_one = "{\"topic\":\"" + topic_def + "\",\"userToken\":\"" + userToken_def + "\",\"op\":\"close\"}"
-            sendAT("AT+CIPSEND=" + (text_one.length + 2),0)
-            sendAT(text_one, 0)
-            kitsiot_connected = !waitResponse()
-        }
-    }
-    /**
-    * Check if ESP8266 successfully connected to KidsIot
-    */
-    //% block="KidsIot connected %State"
-    //% subcategory="KidsIot"
-    export function kidsiotState(state: boolean) {
-        if (kitsiot_connected == state) {
-            return true
-        }
-        else {
-            return false
-        }
-    }
-    /**
-* recevice value from kidsiot
-*/
-    //% block="when switch on"
-    //% subcategory=KidsIot
-    export function iotswitchon(handler: () => void) {
-        recevice_kitiot()
-        control.onEvent(EVENT_ON_ID, EVENT_ON_Value, handler)
-    }
-    /**
-     * recevice value from kidsiot
-     */
-    //% block="when switch off"
-    //% subcategory=KidsIot
-    export function iotswitchoff(handler: () => void) {
-        recevice_kitiot()
-        control.onEvent(EVENT_OFF_ID, EVENT_OFF_Value, handler)
     }
 
-    export function recevice_kitiot() {
-        control.inBackground(function () {
-            while (kidsiotState) {
-                recevice_kidiot_text = serial.readLine()
-                recevice_kidiot_text += serial.readString()
-                if (recevice_kidiot_text.includes("CLOSED")) {
-                    recevice_kidiot_text = ""
-                    kitsiot_connected = false
-                }
-                if (recevice_kidiot_text.includes("switchon")) {
-                    recevice_kidiot_text = ""
-                    control.raiseEvent(EVENT_ON_ID, EVENT_ON_Value, EventCreationMode.CreateAndFire)
-                }
-                if (recevice_kidiot_text.includes("switchof")) {
-                    recevice_kidiot_text = ""
-                    control.raiseEvent(EVENT_OFF_ID, EVENT_OFF_Value, EventCreationMode.CreateAndFire)
-                }
-                basic.pause(20)
-            }
-        })
-    }
 }
