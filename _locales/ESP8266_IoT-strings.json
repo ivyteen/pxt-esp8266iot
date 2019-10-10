@@ -7,7 +7,7 @@
   "ESP8266_IoT.initWIFI|block": "set ESP8266|RX %tx|TX %rx|Baud rate %baudrate",
   "ESP8266_IoT.plaiveLastUploadState|block": "Plaive Last data upload %State",
   "ESP8266_IoT.plaiveState|block": "Plaive connected %State",
-  "ESP8266_IoT.setDataPlaive|block": "set data to send Plaive|Write API key = %write_api_key|Field 1 = %n1|Field 2 = %n2",
+  "ESP8266_IoT.setDataPlaive|block": "set data to send Plaive|Write API key = %write_api_key|Field 1 = %n1|Field 2 = %n2|Field 3 = %n3|Field 4 = %n4|Field 5 = %n5|Field 6 = %n6|Field 7 = %n7|Field 8 = %n8",
   "ESP8266_IoT.setDataThingSpeak|block": "set data to send ThingSpeak|Write API key = %write_api_key|Field 1 = %n1|Field 2 = %n2|Field 3 = %n3|Field 4 = %n4|Field 5 = %n5|Field 6 = %n6|Field 7 = %n7|Field 8 = %n8",
   "ESP8266_IoT.thingSpeakState|block": "ThingSpeak connected %State",
   "ESP8266_IoT.tsLastUploadState|block": "ThingSpeak Last data upload %State",

@@ -5,7 +5,7 @@
   "ESP8266_IoT.connectPlaive|block": "Plaive에 연결",
   "ESP8266_IoT.connectWifi|block": "Wifi 연결|SSID = %ssid|KEY = %pw",
   "ESP8266_IoT.initWIFI|block": "WiFi 모듈 초기화|수신 %tx|송신 %rx|보레이트 %baudrate",
-  "ESP8266_IoT.setDataPlaive|block": "Plaive에 전달할 데이터 지정|API key = %write_api_key|필드 1 = %n1|필드 2 = %n2",
+  "ESP8266_IoT.setDataPlaive|block": "Plaive에 전달할 데이터 지정|API key = %write_api_key|필드 1 = %n1|필드 2 = %n2|필드 3 = %n3|필드 4 = %n4|필드 5 = %n5|필드 6 = %n6|필드 7 = %n7|필드 8 = %n8",
   "ESP8266_IoT.setDataThingSpeak|block": "ThingSpeak에 전달할 데이터 지정|API key = %write_api_key|필드 1 = %n1|필드 2 = %n2|필드 3 = %n3|필드 4 = %n4|필드 5 = %n5|필드 6 = %n6|필드 7 = %n7|필드 8 = %n8",
   "ESP8266_IoT.thingSpeakState|block": "ThingSpeak 연결 상태 %State",
   "ESP8266_IoT.plaiveState|block": "Plaive 연결 상태 %State",
