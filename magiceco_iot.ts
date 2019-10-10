@@ -144,6 +144,7 @@ namespace ESP8266_IoT {
     /**
     * Connect to Plaive and set data. 
     */
+/* Set Data to Plaive with POST (not used)
 	//% inlineInputMode=external
     //% block="set data to send Plaive|Write API key = %write_api_key|Field 1 = %n1|Field 2 = %n2" 
     //% write_api_key.defl=your_write_api_key
@@ -153,12 +154,12 @@ namespace ESP8266_IoT {
         let data = "api_key=" + write_api_key
                     + "&field1=" + n1
                     + "&field2=" + n2
-                /*    + "&field3=" + n3
-                    + "&field4=" + n4
-                    + "&field5=" + n5
-                    + "&field6=" + n6
-                    + "&field7=" + n7
-                    + "&field8=" + n8 */
+                //    + "&field3=" + n3
+                //    + "&field4=" + n4
+                //    + "&field5=" + n5
+                //    + "&field6=" + n6
+                //    + "&field7=" + n7
+                //    + "&field8=" + n8 
 	    if (plaive_connected) {
             toSendStr = "POST /insert.php"
             toSendStr = toSendStr + " HTTP/1.1" + "\r\n"
@@ -169,6 +170,36 @@ namespace ESP8266_IoT {
             //toSendStr = toSendStr + "Connection: close" + "\u000D\u000A" 
         }
 
+    }
+*/
+
+/**
+    * Connect to Plaive and set data. 
+    */
+    //% block="set data to send Plaive|Write API key = %write_api_key|Field 1 = %n1|Field 2 = %n2|Field 3 = %n3|Field 4 = %n4|Field 5 = %n5|Field 6 = %n6|Field 7 = %n7|Field 8 = %n8"
+    //% write_api_key.defl=your_write_api_key
+    //% subcategory="Plaive"
+    export function setDataPlaive(write_api_key: string, n1: number, n2: number, n3: number, n4: number, n5: number, n6: number, n7: number, n8: number) {
+
+        let data = "api_key=" + write_api_key
+                    + "&field1=" + n1
+                    + "&field2=" + n2
+                    + "&field3=" + n3
+                    + "&field4=" + n4
+                    + "&field5=" + n5
+                    + "&field6=" + n6
+                    + "&field7=" + n7
+                    + "&field8=" + n8 
+	    if (plaive_connected) {
+            toSendStr = "GET /insert.php?"
+            toSendStr = toSendStr + data +" HTTP/1.1" + "\r\n"
+            toSendStr = toSendStr + "Host: data.plaive.10make.com" + "\r\n"
+            toSendStr = toSendStr + "Cache-Control: no-cache" + "\r\n"
+            //toSendStr = toSendStr + "Content-Type: application/xE-www-form-urlencoded" + "\r\n"
+            //toSendStr = toSendStr + "Content-Length: " + data.length + "\r\n"
+            //toSendStr = toSendStr + data
+            //toSendStr = toSendStr + "Connection: close" + "\r\n\r\n" 
+        }
     }
 
 
